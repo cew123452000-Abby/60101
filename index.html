@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>環保五關大冒險 - 綠色愛地球小勇士</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ecoGreen: '#2e7d32',
+                        ecoLightGreen: '#a5d6a7',
+                        ecoBg: '#f1f8e9',
+                        ecoAccent: '#ff9800',
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        rounded: ['"Fredoka"', 'cursive', '"Noto Sans TC"'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f7f4;
+            background-image: radial-gradient(#c8e6c9 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .btn-bounce:hover {
+            transform: translateY(-3px) scale(1.02);
+            transition: all 0.2s ease;
+        }
+        .btn-bounce:active {
+            transform: translateY(1px) scale(0.98);
+        }
+        .animate-pop {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .combo-badge {
+            animation: pulseGlow 1s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(255,152,0,0.5); }
+            100% { transform: scale(1.1); box-shadow: 0 0 20px rgba(255,152,0,0.9); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e8f5e9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #81c784;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Audio Synthesizer (Web Audio API) -->
+    <script>
+        // Simple Web Audio API sound effects generator
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.setValueAtTime(140, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'win') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.15);
+                osc.frequency.setValueAtTime(659.25, now + 0.3);
+                osc.frequency.setValueAtTime(880, now + 0.45);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                osc.start(now);
+                osc.stop(now + 0.8);
+            }
+        }
+    </script>
+
+    <!-- Top Navigation Header -->
+    <header class="bg-emerald-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showLevelSelect()">
+                <div class="bg-white text-emerald-700 p-2 rounded-full w-10 h-10 flex items-center justify-center font-bold text-xl shadow">
+                    🌱
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg md:text-xl tracking-wide font-rounded">環保五關大冒險</h1>
+                    <p class="text-xs text-emerald-200">資源回收與永續地球學習手冊</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="showLevelSelect()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-sm font-medium transition shadow flex items-center space-x-1">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>關卡地圖</span>
+                </button>
+                <button onclick="toggleMusic()" id="soundBtn" class="p-2 bg-emerald-800 hover:bg-emerald-600 rounded-full text-sm w-9 h-9 flex items-center justify-center transition">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4 py-6 flex-grow w-full">
+        
+        <!-- Progress Steps Bar -->
+        <div class="bg-white rounded-2xl p-4 shadow-md mb-6 border border-emerald-100">
+            <div class="flex justify-between items-center relative">
+                <!-- Line background -->
+                <div class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-gray-200 w-full z-0"></div>
+                <div id="progressLine" class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-emerald-500 z-0 transition-all duration-500" style="width: 0%"></div>
+
+                <!-- Step Icons -->
+                <button onclick="startLevel(1)" id="step-1" class="z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-emerald-600 text-white shadow-lg ring-4 ring-emerald-100 transition">1</button>
+                <button onclick="startLevel(2)" id="step-2" class="z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-500 shadow ring-4 ring-white transition">2</button>
+                <button onclick="startLevel(3)" id="step-3" class="z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-500 shadow ring-4 ring-white transition">3</button>
+                <button onclick="startLevel(4)" id="step-4" class="z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-500 shadow ring-4 ring-white transition">4</button>
+                <button onclick="startLevel(5)" id="step-5" class="z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-500 shadow ring-4 ring-white transition">5</button>
+            </div>
+            <div class="flex justify-between text-xs text-gray-500 mt-2 font-medium">
+                <span class="w-12 text-center">新手村</span>
+                <span class="w-12 text-center">分類高手</span>
+                <span class="w-12 text-center">急診室</span>
+                <span class="w-12 text-center">廢物變寶物</span>
+                <span class="w-12 text-center">地球倡議</span>
+            </div>
+        </div>
+
+        <!-- ==================== GAME MAP / HOME PAGE ==================== -->
+        <div id="view-map" class="space-y-6 animate-pop">
+            <div class="bg-gradient-to-br from-emerald-500 to-teal-700 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="bg-emerald-800/60 text-emerald-200 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold">學習目標導向</span>
+                    <h2 class="text-2xl md:text-3xl font-extrabold mt-2 mb-3">歡迎來到環保五關大冒險！</h2>
+                    <p class="text-emerald-100 text-sm md:text-base max-w-xl leading-relaxed">
+                        根據你的遊戲設計，我們將通過五個有趣又具挑戰性的關卡，學習正確的垃圾分類、回收前處理、廢物再利用與環保倡議行動！
+                    </p>
+                    <button onclick="startLevel(1)" class="mt-5 px-6 py-3 bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold rounded-xl shadow-lg btn-bounce flex items-center space-x-2">
+                        <span>開始第 1 關大挑戰</span>
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </div>
+                <div class="absolute -right-6 -bottom-8 opacity-20 text-white text-9xl pointer-events-none">
+                    <i class="fa-solid fa-recycle"></i>
+                </div>
+            </div>
+
+            <!-- Level Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Card 1 -->
+                <div onclick="startLevel(1)" class="bg-white p-5 rounded-2xl border-2 border-emerald-200 hover:border-emerald-500 shadow-sm hover:shadow-md transition cursor-pointer flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                        🏡
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">第一關</span>
+                            <h3 class="font-bold text-lg text-slate-800">回收新手村</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">任務目標：建立資源回收基本概念。「垃圾還是資源？」快速判斷！</p>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div onclick="startLevel(2)" class="bg-white p-5 rounded-2xl border-2 border-emerald-200 hover:border-emerald-500 shadow-sm hover:shadow-md transition cursor-pointer flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                        📦
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">第二關</span>
+                            <h3 class="font-bold text-lg text-slate-800">分類高手</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">蛋糕盒、壞掉的桶子、紙箱、啤酒罐、鏡子、鐵罐分類挑戰！</p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div onclick="startLevel(3)" class="bg-white p-5 rounded-2xl border-2 border-amber-200 hover:border-amber-500 shadow-sm hover:shadow-md transition cursor-pointer flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                        🏥
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded">第三關</span>
+                            <h3 class="font-bold text-lg text-slate-800">回收急診室</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">珍珠奶茶情境處理 + 30題限時高壓極速分類挑戰（含雙倍計分）！</p>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div onclick="startLevel(4)" class="bg-white p-5 rounded-2xl border-2 border-purple-200 hover:border-purple-500 shadow-sm hover:shadow-md transition cursor-pointer flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                        ✨
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded">第四關</span>
+                            <h3 class="font-bold text-lg text-slate-800">廢物變寶物</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">任務目標：從「回收」進一步思考「再利用」。廢棄物新用途配對！</p>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div onclick="startLevel(5)" class="bg-white p-5 rounded-2xl border-2 border-teal-200 hover:border-teal-500 shadow-sm hover:shadow-md transition cursor-pointer md:col-span-2 flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                        🌍
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded">第五關</span>
+                            <h3 class="font-bold text-lg text-slate-800">地球倡議者</h3>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">「分類回收物，世界都領悟」選擇生活承諾，生成屬於你的倡議海報與證書！</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==================== LEVEL 1: 回收新手村 ==================== -->
+        <div id="view-level-1" class="hidden space-y-6 animate-pop">
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-emerald-100">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b">
+                    <div>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full">第一關｜回收新手村</span>
+                        <h2 class="text-xl font-bold mt-1 text-slate-800">任務目標：建立資源回收基本概念</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-gray-500">得分</span>
+                        <p id="l1-score" class="text-2xl font-black text-emerald-600">0</p>
+                    </div>
+                </div>
+
+                <!-- Concept Introduction Banner -->
+                <div class="bg-emerald-50 rounded-2xl p-4 mb-6 text-sm text-emerald-900 border border-emerald-200">
+                    <p class="font-bold mb-1">💡 我要讓玩家知道：</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-emerald-200 px-2 py-1 rounded">✔ 為什麼需要資源回收</span>
+                        <span class="bg-emerald-200 px-2 py-1 rounded">✔ 垃圾與資源的差別</span>
+                    </div>
+                </div>
+
+                <!-- Challenge Area -->
+                <div class="text-center py-4">
+                    <p class="text-gray-500 text-sm mb-2">快速判斷題（共 5 題）</p>
+                    <h3 class="text-2xl font-black text-slate-800 mb-6" id="l1-question-title">準備好了嗎？</h3>
+
+                    <div id="l1-card-box" class="max-w-md mx-auto bg-slate-50 border-2 border-dashed border-emerald-300 rounded-3xl p-8 mb-6 shadow-inner flex flex-col items-center justify-center min-h-[220px]">
+                        <div id="l1-item-icon" class="text-6xl mb-3">📦</div>
+                        <h4 id="l1-item-name" class="text-2xl font-bold text-slate-800">乾淨保特瓶</h4>
+                        <p id="l1-item-desc" class="text-xs text-gray-500 mt-1">未變形的飲用水寶特瓶</p>
+                    </div>
+
+                    <div id="l1-buttons" class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                        <button onclick="checkL1Answer('resource')" class="py-4 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-bold text-lg rounded-2xl shadow-lg btn-bounce flex flex-col items-center justify-center">
+                            <span class="text-2xl">♻️</span>
+                            <span>資源回收</span>
+                        </button>
+                        <button onclick="checkL1Answer('trash')" class="py-4 bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white font-bold text-lg rounded-2xl shadow-lg btn-bounce flex flex-col items-center justify-center">
+                            <span class="text-2xl">🗑️</span>
+                            <span>一般垃圾</span>
+                        </button>
+                    </div>
+
+                    <!-- Level 1 Completion Popup -->
+                    <div id="l1-complete-msg" class="hidden mt-6 bg-emerald-100 p-6 rounded-2xl border border-emerald-300">
+                        <div class="text-4xl mb-2">🎉</div>
+                        <h3 class="text-xl font-bold text-emerald-900">恭喜通過第一關！</h3>
+                        <p class="text-sm text-emerald-700 mt-1">你已經掌握了「資源」與「垃圾」的基本概念！</p>
+                        <button onclick="startLevel(2)" class="mt-4 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow btn-bounce">
+                            進入第二關：分類高手 👉
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== LEVEL 2: 分類高手 ==================== -->
+        <div id="view-level-2" class="hidden space-y-6 animate-pop">
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-blue-100">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b">
+                    <div>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-800 rounded-full">第二關｜分類高手</span>
+                        <h2 class="text-xl font-bold mt-1 text-slate-800">任務目標：正確判斷不同回收物</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-gray-500">完成進度</span>
+                        <p id="l2-progress" class="text-xl font-bold text-blue-600">0 / 6</p>
+                    </div>
+                </div>
+
+                <!-- Learning goals checkboxes display -->
+                <div class="bg-blue-50 rounded-2xl p-3 mb-4 text-xs text-blue-900 flex flex-wrap gap-3">
+                    <span class="font-bold">正確分類類別：</span>
+                    <span class="bg-blue-200 px-2 py-0.5 rounded">☑ 紙類</span>
+                    <span class="bg-blue-200 px-2 py-0.5 rounded">☑ 塑膠</span>
+                    <span class="bg-blue-200 px-2 py-0.5 rounded">☑ 金屬</span>
+                    <span class="bg-blue-200 px-2 py-0.5 rounded">☑ 玻璃/一般垃圾</span>
+                </div>
+
+                <div class="text-center py-2">
+                    <p class="text-sm text-gray-600 font-medium mb-3">請將下方生活物品放入正確的回收桶（可直接點擊物品後選擇分類）：</p>
+                    
+                    <!-- Items Pool (Specific handwritten items from user image) -->
+                    <div id="l2-items-pool" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                        <!-- Items rendered via JS -->
+                    </div>
+
+                    <!-- Bins Categories -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div onclick="selectBinForActive('paper')" class="bg-amber-50 border-2 border-amber-300 hover:bg-amber-100 p-4 rounded-2xl cursor-pointer transition flex flex-col items-center">
+                            <span class="text-3xl mb-1">📦</span>
+                            <span class="font-bold text-amber-900 text-sm">紙類</span>
+                            <span class="text-[10px] text-amber-600">紙箱、紙盒...</span>
+                        </div>
+                        <div onclick="selectBinForActive('plastic')" class="bg-rose-50 border-2 border-rose-300 hover:bg-rose-100 p-4 rounded-2xl cursor-pointer transition flex flex-col items-center">
+                            <span class="text-3xl mb-1">🥤</span>
+                            <span class="font-bold text-rose-900 text-sm">塑膠類</span>
+                            <span class="text-[10px] text-rose-600">塑膠桶、寶特瓶...</span>
+                        </div>
+                        <div onclick="selectBinForActive('metal')" class="bg-slate-100 border-2 border-slate-300 hover:bg-slate-200 p-4 rounded-2xl cursor-pointer transition flex flex-col items-center">
+                            <span class="text-3xl mb-1">🥫</span>
+                            <span class="font-bold text-slate-800 text-sm">金屬類</span>
+                            <span class="text-[10px] text-slate-500">鐵罐、啤酒罐...</span>
+                        </div>
+                        <div onclick="selectBinForActive('trash')" class="bg-stone-100 border-2 border-stone-300 hover:bg-stone-200 p-4 rounded-2xl cursor-pointer transition flex flex-col items-center">
+                            <span class="text-3xl mb-1">🗑️</span>
+                            <span class="font-bold text-stone-800 text-sm">一般垃圾/特殊</span>
+                            <span class="text-[10px] text-stone-500">鏡子(不可回收玻璃)...</span>
+                        </div>
+                    </div>
+
+                    <!-- Level 2 Completion Box -->
+                    <div id="l2-complete-msg" class="hidden mt-6 bg-blue-100 p-6 rounded-2xl border border-blue-300">
+                        <div class="text-4xl mb-2">🌟</div>
+                        <h3 class="text-xl font-bold text-blue-900">太棒了！分類高手任務達成！</h3>
+                        <p class="text-sm text-blue-700 mt-1">你成功將蛋糕盒、壞掉的桶子、紙箱、啤酒罐、鏡子與鐵罐正確分類了！</p>
+                        <button onclick="startLevel(3)" class="mt-4 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow btn-bounce">
+                            進入第三關：回收急診室 👉
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== LEVEL 3: 回收急診室 ==================== -->
+        <div id="view-level-3" class="hidden space-y-6 animate-pop">
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-amber-100">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b">
+                    <div>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full">第三關｜回收急診室</span>
+                        <h2 class="text-xl font-bold mt-1 text-slate-800">任務目標：正確預處理 + 高速分類大考驗</h2>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="text-right">
+                            <span class="text-xs text-gray-500">當前分數</span>
+                            <p id="l3-score" class="text-xl font-black text-amber-600">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part 1: Scenario Learning (Handwritten Drink Cup Problem) -->
+                <div id="l3-phase1" class="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 mb-6">
+                    <div class="flex items-start space-x-3">
+                        <div class="text-3xl">🧋</div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold text-amber-900">🚨 急診室急件：小明的珍珠奶茶處理事件</h3>
+                            <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                                情境：小明喝完珍珠奶茶，把還有冰塊、吸管和珍珠的飲料杯直接丟進回收桶！<br/>
+                                <strong class="text-amber-900">正確處理順序：</strong> 
+                                <span class="bg-amber-200 px-1.5 py-0.5 rounded font-bold">1. 倒乾淨</span> ➔ 
+                                <span class="bg-amber-200 px-1.5 py-0.5 rounded font-bold">2. 塑膠膜與吸管丟一般垃圾</span> ➔ 
+                                <span class="bg-amber-200 px-1.5 py-0.5 rounded font-bold">3. 杯子沖洗乾淨</span> ➔ 
+                                <span class="bg-amber-200 px-1.5 py-0.5 rounded font-bold">4. 正確分類回收</span>
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="startL3SpeedChallengeSelect()" class="mt-4 w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow btn-bounce flex items-center justify-center space-x-2">
+                        <span>我學會了！進入 30 題極速分類挑戰</span>
+                        <i class="fa-solid fa-bolt"></i>
+                    </button>
+                </div>
+
+                <!-- Part 2: Speed Challenge Difficulty Setup -->
+                <div id="l3-phase2" class="hidden text-center py-6">
+                    <h3 class="text-2xl font-black text-slate-800 mb-2">⚡ 選擇難度模式</h3>
+                    <p class="text-xs text-gray-500 mb-6">在限時內分類完 30 個物品！連續答對 5 題以上觸發【分數雙倍 Combo】！ (每題基本 5 分)</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto mb-6">
+                        <button onclick="startL3TimerGame(90)" class="p-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-emerald-900 font-bold btn-bounce">
+                            <div class="text-2xl mb-1">🌱 簡單</div>
+                            <div class="text-xs opacity-80">限時 90 秒</div>
+                        </button>
+                        <button onclick="startL3TimerGame(60)" class="p-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-amber-900 font-bold btn-bounce">
+                            <div class="text-2xl mb-1">🔥 中等</div>
+                            <div class="text-xs opacity-80">限時 60 秒</div>
+                        </button>
+                        <button onclick="startL3TimerGame(30)" class="p-5 bg-rose-100 hover:bg-rose-200 border-2 border-rose-400 rounded-2xl text-rose-900 font-bold btn-bounce">
+                            <div class="text-2xl mb-1">⚡ 困難</div>
+                            <div class="text-xs opacity-80">限時 30 秒</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Part 3: Active Gameplay Screen -->
+                <div id="l3-gameplay" class="hidden">
+                    <!-- Status Bar -->
+                    <div class="flex justify-between items-center bg-slate-100 p-3 rounded-2xl mb-4 font-mono">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-gray-500">倒數時間:</span>
+                            <span id="l3-timer" class="text-xl font-bold text-rose-600">60s</span>
+                        </div>
+                        <div id="l3-combo-box" class="hidden combo-badge bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center space-x-1">
+                            <span>🔥 COMBO x2 雙倍加分中!</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-gray-500">完成數:</span>
+                            <span id="l3-item-count" class="text-lg font-bold text-slate-700">0 / 30</span>
+                        </div>
+                    </div>
+
+                    <!-- Current Item Card -->
+                    <div id="l3-card" class="bg-amber-50 border-2 border-amber-300 rounded-3xl p-6 text-center max-w-sm mx-auto mb-6 shadow-md">
+                        <div id="l3-item-icon" class="text-6xl mb-2">🥤</div>
+                        <h4 id="l3-item-name" class="text-xl font-bold text-slate-800">喝完的寶特瓶</h4>
+                        <p id="l3-item-desc" class="text-xs text-amber-800 mt-1">已洗淨無殘留水漬</p>
+                    </div>
+
+                    <!-- Quick Bins -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-md mx-auto">
+                        <button onclick="answerL3('paper')" class="py-3 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl border border-amber-300 text-sm">📦 紙類</button>
+                        <button onclick="answerL3('plastic')" class="py-3 bg-rose-100 hover:bg-rose-200 text-rose-900 font-bold rounded-xl border border-rose-300 text-sm">🥤 塑膠</button>
+                        <button onclick="answerL3('metal')" class="py-3 bg-slate-200 hover:bg-slate-300 text-slate-900 font-bold rounded-xl border border-slate-300 text-sm">🥫 金屬</button>
+                        <button onclick="answerL3('trash')" class="py-3 bg-stone-200 hover:bg-stone-300 text-stone-900 font-bold rounded-xl border border-stone-300 text-sm">🗑️ 垃圾</button>
+                    </div>
+                </div>
+
+                <!-- Part 4: Game Over / Results -->
+                <div id="l3-results" class="hidden text-center py-6 bg-amber-50 rounded-2xl p-6 border border-amber-200">
+                    <div class="text-5xl mb-2">🏆</div>
+                    <h3 class="text-2xl font-black text-amber-900">急診室挑戰完成！</h3>
+                    <p class="text-sm text-amber-800 mt-1">最終獲得總分：<span id="l3-final-score" class="font-extrabold text-2xl text-amber-600">0</span> 分</p>
+                    <p id="l3-eval-msg" class="text-xs text-gray-600 mt-2">太厲害了！你反應迅速，是極佳的回收急診大夫！</p>
+                    
+                    <button onclick="startLevel(4)" class="mt-5 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow btn-bounce">
+                        進入第四關：廢物變寶物 👉
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==================== LEVEL 4: 廢物變寶物 ==================== -->
+        <div id="view-level-4" class="hidden space-y-6 animate-pop">
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-purple-100">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b">
+                    <div>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-purple-100 text-purple-800 rounded-full">第四關｜廢物變寶物</span>
+                        <h2 class="text-xl font-bold mt-1 text-slate-800">任務目標：從「回收」進一步思考「再利用」</h2>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500">配對配對</span>
+                        <p id="l4-count" class="text-xl font-bold text-purple-600">0 / 3</p>
+                    </div>
+                </div>
+
+                <div class="bg-purple-50 p-4 rounded-2xl mb-6 text-xs text-purple-900">
+                    <p class="font-bold mb-1">🍰 學習單重點範例：</p>
+                    <p>廢棄物：<strong>蛋糕盒</strong> (原本用途：裝蛋糕) ➔ 新用途：<strong>1. 清洗乾淨裝其他東西 / 2. 拿來做手工 / 3. 當保麗龍箱收納</strong></p>
+                </div>
+
+                <p class="text-sm text-gray-600 mb-4 font-medium text-center">請點擊選擇左邊的【廢棄物】，再點擊右邊對應的【創意再利用新用途】：</p>
+
+                <div id="l4-match-area" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Left Column: Waste Items -->
+                    <div class="space-y-3" id="l4-waste-list">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Right Column: New Purpose -->
+                    <div class="space-y-3" id="l4-purpose-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Level 4 Complete Message -->
+                <div id="l4-complete-msg" class="hidden mt-6 bg-purple-100 p-6 rounded-2xl border border-purple-300 text-center">
+                    <div class="text-4xl mb-2">🎁</div>
+                    <h3 class="text-xl font-bold text-purple-900">太驚豔了！創意再利用大成功！</h3>
+                    <p class="text-sm text-purple-700 mt-1">物品不只能回收，給予創意就能重獲新生！</p>
+                    <button onclick="startLevel(5)" class="mt-4 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow btn-bounce">
+                        進入終極關卡：地球倡議者 👉
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==================== LEVEL 5: 地球倡議者 ==================== -->
+        <div id="view-level-5" class="hidden space-y-6 animate-pop">
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-teal-100">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b">
+                    <div>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-teal-100 text-teal-800 rounded-full">第五關｜地球倡議者</span>
+                        <h2 class="text-xl font-bold mt-1 text-slate-800">任務目標：理解回收價值，採取實際行動</h2>
+                    </div>
+                    <span class="text-2xl">🌍</span>
+                </div>
+
+                <!-- Section 1: Core Thought Fill-in -->
+                <div class="space-y-6">
+                    <div class="bg-teal-50 p-5 rounded-2xl border border-teal-200">
+                        <label class="block text-sm font-bold text-teal-900 mb-2">
+                            1. 完成你的環保信念問答：
+                        </label>
+                        <div class="flex flex-wrap items-center gap-2 text-sm text-slate-800 font-medium">
+                            <span>「我認為大家應該做好資源回收，因為：</span>
+                            <input type="text" id="l5-input-reason" value="這樣海洋不會有更多垃圾" class="px-3 py-1.5 bg-white border-2 border-teal-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-bold text-teal-800 flex-grow min-w-[220px]" placeholder="填寫你的理由..." />
+                            <span>。」</span>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Choose 3 Actions -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-800 mb-2">
+                            2. 選擇自己在日常生活中【願意做到的 3 件事】 (<span id="l5-check-count" class="text-teal-600">0</span>/3)：
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" onchange="updateL5Check()" class="l5-checkbox w-4 h-4 text-teal-600 rounded" value="隨身攜帶環保餐具與購物袋">
+                                <span>🍴 隨身攜帶環保餐具與購物袋</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" onchange="updateL5Check()" class="l5-checkbox w-4 h-4 text-teal-600 rounded" value="喝完飲料清洗乾淨再分類回收">
+                                <span>🧋 喝完飲料清洗乾淨再分類回收</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" onchange="updateL5Check()" class="l5-checkbox w-4 h-4 text-teal-600 rounded" value="不亂丟垃圾，做好垃圾減量">
+                                <span>🗑️ 不亂丟垃圾，做好垃圾減量</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" onchange="updateL5Check()" class="l5-checkbox w-4 h-4 text-teal-600 rounded" value="主動向家人朋友宣導資源回收">
+                                <span>🗣️ 主動向家人朋友宣導資源回收</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Slogan -->
+                    <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-200">
+                        <label class="block text-xs text-emerald-800 font-bold mb-1">📢 我的倡議標語（學習單精選）：</label>
+                        <div class="text-xl font-black text-emerald-900 tracking-wide text-center py-2">
+                            「分類回收物，世界都領悟」
+                        </div>
+                    </div>
+
+                    <button onclick="generateCertificate()" id="l5-btn" disabled class="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl shadow cursor-not-allowed transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-award"></i>
+                        <span>請先勾選 3 項行動以生成倡議海報</span>
+                    </button>
+                </div>
+
+                <!-- Certificate / Poster Result -->
+                <div id="l5-poster" class="hidden mt-8 bg-gradient-to-br from-emerald-600 via-teal-700 to-cyan-800 text-white rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden border-4 border-amber-300">
+                    <div class="text-center relative z-10 space-y-4">
+                        <span class="bg-amber-400 text-slate-900 text-xs font-black px-4 py-1 rounded-full uppercase tracking-wider">地球小勇士 倡議海報</span>
+                        <h3 class="text-2xl sm:text-3xl font-black text-amber-200 mt-2 tracking-wide font-rounded">🌍 地球倡議者宣言</h3>
+                        
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 my-4 border border-white/20 text-left space-y-3">
+                            <p class="text-sm">
+                                💡 <strong>我的信念：</strong> 我認為大家應該做好資源回收，因為<span id="poster-reason" class="text-amber-300 font-bold underline px-1">這樣海洋不會有更多垃圾</span>。
+                            </p>
+                            <div>
+                                <p class="text-sm font-bold text-amber-200 mb-1">✋ 我的三大承諾行動：</p>
+                                <ul id="poster-actions" class="list-disc list-inside text-xs space-y-1 text-emerald-100">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-400/20 rounded-xl p-3 border border-amber-300/40">
+                            <p class="text-xs text-amber-200">我的倡議標語</p>
+                            <p class="text-xl sm:text-2xl font-black tracking-widest text-amber-300 mt-1">「分類回收物，世界都領悟」</p>
+                        </div>
+
+                        <div class="pt-4 flex justify-center space-x-3">
+                            <button onclick="showLevelSelect()" class="px-5 py-2.5 bg-white text-emerald-800 font-bold rounded-xl shadow hover:bg-emerald-50 btn-bounce text-sm">
+                                🔁 重新挑戰關卡
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-400 text-xs text-center py-4 mt-8">
+        <p>🌱 環保五關大冒險 - 互動學習網頁遊戲 | 專為資源回收永續教育設計</p>
+    </footer>
+
+    <!-- ==================== GAME LOGIC SCRIPT ==================== -->
+    <script>
+        // State management
+        let currentLevel = 1;
+        
+        // --- LEVEL 1 DATA & LOGIC ---
+        const l1Data = [
+            { name: "乾淨寶特瓶", icon: "🍾", desc: "洗淨無殘留液體的塑膠飲料瓶", answer: "resource" },
+            { name: "吃剩的魚骨頭", icon: "🦴", desc: "廚餘廚房廢棄物", answer: "trash" },
+            { name: "乾淨紙箱", icon: "📦", desc: "壓平折好的快遞紙箱", answer: "resource" },
+            { name: "沾滿油污的髒紙巾", icon: "🧻", desc: "擦過油膩桌面無法清洗的衛生紙", answer: "trash" },
+            { name: "鋁罐", icon: "🥫", desc: "喝完洗乾淨的飲料金屬罐", answer: "resource" }
+        ];
+        let l1Index = 0;
+        let l1Score = 0;
+
+        function updateL1Card() {
+            if (l1Index < l1Data.length) {
+                const item = l1Data[l1Index];
+                document.getElementById('l1-item-icon').innerText = item.icon;
+                document.getElementById('l1-item-name').innerText = item.name;
+                document.getElementById('l1-item-desc').innerText = item.desc;
+                document.getElementById('l1-question-title').innerText = `題目 ${l1Index + 1} / ${l1Data.length}`;
+            } else {
+                // Done L1
+                document.getElementById('l1-card-box').classList.add('hidden');
+                document.getElementById('l1-buttons').classList.add('hidden');
+                document.getElementById('l1-complete-msg').classList.remove('hidden');
+                playSound('win');
+            }
+        }
+
+        function checkL1Answer(userChoice) {
+            playSound('click');
+            const item = l1Data[l1Index];
+            if (userChoice === item.answer) {
+                l1Score += 20;
+                document.getElementById('l1-score').innerText = l1Score;
+                playSound('correct');
+            } else {
+                playSound('wrong');
+            }
+            l1Index++;
+            updateL1Card();
+        }
+
+        // --- LEVEL 2 DATA & LOGIC (Specific Handwritten Items) ---
+        // 1. 蛋糕盒 2. 壞掉的桶子 3. 紙箱 4. 啤酒罐 5. 鏡子 6. 鐵罐
+        const l2Items = [
+            { id: 1, name: "蛋糕盒", icon: "🎂", type: "paper", label: "紙類/紙盒" },
+            { id: 2, name: "壞掉的桶子", icon: "🪣", type: "trash", label: "一般垃圾" },
+            { id: 3, name: "紙箱", icon: "📦", type: "paper", label: "紙類" },
+            { id: 4, name: "啤酒罐", icon: "🍺", type: "metal", label: "金屬類" },
+            { id: 5, name: "鏡子", icon: "🪞", type: "trash", label: "一般垃圾(無法回收玻璃)" },
+            { id: 6, name: "鐵罐", icon: "🥫", type: "metal", label: "金屬類" }
+        ];
+        let l2ActiveItem = null;
+        let l2Completed = 0;
+
+        function renderL2Pool() {
+            const container = document.getElementById('l2-items-pool');
+            container.innerHTML = '';
+            l2Items.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `l2-item-btn-${item.id}`;
+                btn.onclick = () => selectL2Item(item);
+                btn.className = `p-3 rounded-2xl border-2 transition flex flex-col items-center justify-center ${
+                    item.done ? 'bg-gray-100 border-gray-300 opacity-40 cursor-default' : 
+                    (l2ActiveItem && l2ActiveItem.id === item.id ? 'bg-blue-100 border-blue-500 ring-2 ring-blue-300' : 'bg-white border-blue-200 hover:border-blue-400')
+                }`;
+                btn.innerHTML = `
+                    <span class="text-3xl mb-1">${item.icon}</span>
+                    <span class="font-bold text-xs text-slate-800">${item.name}</span>
+                    ${item.done ? '<span class="text-[10px] text-emerald-600 font-bold mt-1">✓ 已分類</span>' : '<span class="text-[10px] text-gray-400 mt-1">點擊選擇</span>'}
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectL2Item(item) {
+            if (item.done) return;
+            playSound('click');
+            l2ActiveItem = item;
+            renderL2Pool();
+        }
+
+        function selectBinForActive(binType) {
+            if (!l2ActiveItem) {
+                alert("請先在上方點擊選擇一個要分類的物品！");
+                return;
+            }
+            if (l2ActiveItem.type === binType) {
+                playSound('correct');
+                l2ActiveItem.done = true;
+                l2Completed++;
+                document.getElementById('l2-progress').innerText = `${l2Completed} / 6`;
+                l2ActiveItem = null;
+                renderL2Pool();
+
+                if (l2Completed === 6) {
+                    document.getElementById('l2-complete-msg').classList.remove('hidden');
+                    playSound('win');
+                }
+            } else {
+                playSound('wrong');
+                alert(`答錯囉！「${l2ActiveItem.name}」的正確分類不是這個喔！再試一次！`);
+            }
+        }
+
+        // --- LEVEL 3 SPEED CHALLENGE & COMBO SYSTEM ---
+        let l3Score = 0;
+        let l3Combo = 0;
+        let l3ItemIndex = 0;
+        let l3Timer = null;
+        let l3TimeLeft = 60;
+        
+        // 30 Generated Items for Level 3 ER Rapid Challenge
+        const l3Pool = [
+            { name: "乾淨飲料杯", icon: "🥤", type: "plastic" },
+            { name: "廢紙箱", icon: "📦", type: "paper" },
+            { name: "易開罐", icon: "🥫", type: "metal" },
+            { name: "髒衛生紙", icon: "🧻", type: "trash" },
+            { name: "牛奶塑膠瓶", icon: "🥛", type: "plastic" },
+            { name: "報紙", icon: "📰", type: "paper" },
+            { name: "鐵罐頭", icon: "🥫", type: "metal" },
+            { name: "塑膠吸管", icon: "🥤", type: "trash" },
+            { name: "洗淨手搖杯", icon: "🥤", type: "plastic" },
+            { name: "廢紙碗", icon: "🥣", type: "paper" },
+            { name: "破罐子", icon: "🏺", type: "trash" },
+            { name: "啤酒鐵罐", icon: "🍺", type: "metal" },
+            { name: "乾淨蛋糕紙盒", icon: "🍰", type: "paper" },
+            { name: "塑膠封口膜", icon: "🏷️", type: "trash" },
+            { name: "礦泉水瓶", icon: "🍾", type: "plastic" },
+            { name: "雜誌紙頁", icon: "📖", type: "paper" },
+            { name: "壞掉的桶子", icon: "🪣", type: "trash" },
+            { name: "舊鏡子碎片", icon: "🪞", type: "trash" },
+            { name: "鋁箔包", icon: "🧃", type: "paper" },
+            { name: "鋁製飲料罐", icon: "🥤", type: "metal" },
+            { name: "沾滿醬汁的竹籤", icon: "🍢", type: "trash" },
+            { name: "洗淨洗髮精瓶", icon: "🧴", type: "plastic" },
+            { name: "舊課本", icon: "📚", type: "paper" },
+            { name: "金屬罐", icon: "🥫", type: "metal" },
+            { name: "塑膠袋(髒)", icon: "🛍️", type: "trash" },
+            { name: "優格杯(洗淨)", icon: "🍧", type: "plastic" },
+            { name: "乾淨便當盒", icon: "🍱", type: "paper" },
+            { name: "汽水罐", icon: "🥤", type: "metal" },
+            { name: "碎玻璃鏡", icon: "🪞", type: "trash" },
+            { name: "乾淨塑膠盒", icon: "📦", type: "plastic" }
+        ];
+
+        function startL3SpeedChallengeSelect() {
+            playSound('click');
+            document.getElementById('l3-phase1').classList.add('hidden');
+            document.getElementById('l3-phase2').classList.remove('hidden');
+        }
+
+        function startL3TimerGame(seconds) {
+            playSound('click');
+            l3TimeLeft = seconds;
+            l3Score = 0;
+            l3Combo = 0;
+            l3ItemIndex = 0;
+            
+            document.getElementById('l3-phase2').classList.add('hidden');
+            document.getElementById('l3-gameplay').classList.remove('hidden');
+            
+            updateL3Item();
+
+            // Start Timer
+            if (l3Timer) clearInterval(l3Timer);
+            l3Timer = setInterval(() => {
+                l3TimeLeft--;
+                document.getElementById('l3-timer').innerText = `${l3TimeLeft}s`;
+                if (l3TimeLeft <= 0) {
+                    endL3Game();
+                }
+            }, 1000);
+        }
+
+        function updateL3Item() {
+            if (l3ItemIndex >= l3Pool.length) {
+                endL3Game();
+                return;
+            }
+            const item = l3Pool[l3ItemIndex];
+            document.getElementById('l3-item-icon').innerText = item.icon;
+            document.getElementById('l3-item-name').innerText = item.name;
+            document.getElementById('l3-item-count').innerText = `${l3ItemIndex + 1} / ${l3Pool.length}`;
+
+            // Combo display
+            const comboBox = document.getElementById('l3-combo-box');
+            if (l3Combo >= 5) {
+                comboBox.classList.remove('hidden');
+            } else {
+                comboBox.classList.add('hidden');
+            }
+        }
+
+        function answerL3(type) {
+            const item = l3Pool[l3ItemIndex];
+            if (type === item.type) {
+                playSound('correct');
+                l3Combo++;
+                // Base 5 points, doubled if combo >= 5
+                const points = l3Combo >= 5 ? 10 : 5;
+                l3Score += points;
+            } else {
+                playSound('wrong');
+                l3Combo = 0; // reset combo
+            }
+
+            document.getElementById('l3-score').innerText = l3Score;
+            l3ItemIndex++;
+            updateL3Item();
+        }
+
+        function endL3Game() {
+            clearInterval(l3Timer);
+            playSound('win');
+            document.getElementById('l3-gameplay').classList.add('hidden');
+            document.getElementById('l3-results').classList.remove('hidden');
+            document.getElementById('l3-final-score').innerText = l3Score;
+        }
+
+        // --- LEVEL 4 MATCHING LOGIC ---
+        const l4Pairs = [
+            { id: 1, waste: "🎂 蛋糕盒", purpose: "裝乾淨雜物 / 手工藝 / 保麗龍盒收納" },
+            { id: 2, waste: "🍾 寶特瓶", purpose: "做成自動澆水植栽盆" },
+            { id: 3, waste: "📦 廢紙箱", purpose: "改造為貓咪城堡或收納箱" }
+        ];
+        let l4SelectedWaste = null;
+        let l4MatchedCount = 0;
+
+        function renderL4() {
+            const wasteList = document.getElementById('l4-waste-list');
+            const purposeList = document.getElementById('l4-purpose-list');
+            
+            wasteList.innerHTML = '';
+            purposeList.innerHTML = '';
+
+            l4Pairs.forEach(p => {
+                // Waste button
+                const btnW = document.createElement('button');
+                btnW.className = `w-full p-4 rounded-2xl border-2 text-left transition font-bold text-sm ${
+                    p.matched ? 'bg-gray-100 border-gray-300 text-gray-400 cursor-default' : 
+                    (l4SelectedWaste === p.id ? 'bg-purple-100 border-purple-600 ring-2 ring-purple-300 text-purple-900' : 'bg-white border-purple-200 hover:border-purple-400 text-slate-800')
+                }`;
+                btnW.innerText = p.waste;
+                btnW.onclick = () => {
+                    if (!p.matched) {
+                        playSound('click');
+                        l4SelectedWaste = p.id;
+                        renderL4();
+                    }
+                };
+                wasteList.appendChild(btnW);
+            });
+
+            // Shuffle purpose list display
+            const shuffledPurposes = [...l4Pairs].sort((a,b) => a.id - b.id);
+            shuffledPurposes.forEach(p => {
+                const btnP = document.createElement('button');
+                btnP.className = `w-full p-4 rounded-2xl border-2 text-left transition font-bold text-xs ${
+                    p.matched ? 'bg-emerald-50 border-emerald-300 text-emerald-700 cursor-default' : 'bg-white border-purple-200 hover:border-purple-400 text-slate-700'
+                }`;
+                btnP.innerText = `✨ 新用途：${p.purpose}`;
+                btnP.onclick = () => {
+                    if (p.matched) return;
+                    if (!l4SelectedWaste) {
+                        alert("請先選擇左邊的廢棄物！");
+                        return;
+                    }
+                    if (l4SelectedWaste === p.id) {
+                        playSound('correct');
+                        p.matched = true;
+                        l4MatchedCount++;
+                        l4SelectedWaste = null;
+                        document.getElementById('l4-count').innerText = `${l4MatchedCount} / 3`;
+                        renderL4();
+                        if (l4MatchedCount === 3) {
+                            document.getElementById('l4-complete-msg').classList.remove('hidden');
+                            playSound('win');
+                        }
+                    } else {
+                        playSound('wrong');
+                        alert("這個用途與選擇的廢棄物不太配對喔！再想想看！");
+                    }
+                };
+                purposeList.appendChild(btnP);
+            });
+        }
+
+        // --- LEVEL 5 LOGIC ---
+        function updateL5Check() {
+            const checked = document.querySelectorAll('.l5-checkbox:checked');
+            document.getElementById('l5-check-count').innerText = checked.length;
+            const btn = document.getElementById('l5-btn');
+
+            if (checked.length === 3) {
+                btn.disabled = false;
+                btn.className = "w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow btn-bounce flex items-center justify-center space-x-2 cursor-pointer";
+                btn.querySelector('span').innerText = "✨ 點擊生成專屬倡議海報與證書！";
+            } else {
+                btn.disabled = true;
+                btn.className = "w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl shadow cursor-not-allowed flex items-center justify-center space-x-2";
+                btn.querySelector('span').innerText = `請勾選 3 項行動 (目前已選 ${checked.length} 項)`;
+            }
+        }
+
+        function generateCertificate() {
+            playSound('win');
+            const reason = document.getElementById('l5-input-reason').value || "這樣海洋不會有更多垃圾";
+            document.getElementById('poster-reason').innerText = reason;
+
+            const checked = document.querySelectorAll('.l5-checkbox:checked');
+            const ul = document.getElementById('poster-actions');
+            ul.innerHTML = '';
+            checked.forEach(c => {
+                const li = document.createElement('li');
+                li.innerText = c.value;
+                ul.appendChild(li);
+            });
+
+            document.getElementById('l5-poster').classList.remove('hidden');
+            document.getElementById('l5-poster').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- LEVEL NAVIGATION & CONTROLLER ---
+        function startLevel(lvl) {
+            playSound('click');
+            currentLevel = lvl;
+
+            // Hide all views
+            document.getElementById('view-map').classList.add('hidden');
+            document.getElementById('view-level-1').classList.add('hidden');
+            document.getElementById('view-level-2').classList.add('hidden');
+            document.getElementById('view-level-3').classList.add('hidden');
+            document.getElementById('view-level-4').classList.add('hidden');
+            document.getElementById('view-level-5').classList.add('hidden');
+
+            // Update Header progress steps styling
+            for (let i = 1; i <= 5; i++) {
+                const stepBtn = document.getElementById(`step-${i}`);
+                if (i === lvl) {
+                    stepBtn.className = "z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-emerald-600 text-white shadow-lg ring-4 ring-emerald-200 scale-110 transition";
+                } else if (i < lvl) {
+                    stepBtn.className = "z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-emerald-500 text-white shadow ring-2 ring-emerald-100 transition";
+                } else {
+                    stepBtn.className = "z-10 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-200 text-gray-500 shadow ring-4 ring-white transition";
+                }
+            }
+            document.getElementById('progressLine').style.width = `${(lvl - 1) * 25}%`;
+
+            // View Routing & Initializations
+            if (lvl === 1) {
+                document.getElementById('view-level-1').classList.remove('hidden');
+                updateL1Card();
+            } else if (lvl === 2) {
+                document.getElementById('view-level-2').classList.remove('hidden');
+                renderL2Pool();
+            } else if (lvl === 3) {
+                document.getElementById('view-level-3').classList.remove('hidden');
+            } else if (lvl === 4) {
+                document.getElementById('view-level-4').classList.remove('hidden');
+                renderL4();
+            } else if (lvl === 5) {
+                document.getElementById('view-level-5').classList.remove('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showLevelSelect() {
+            playSound('click');
+            document.getElementById('view-level-1').classList.add('hidden');
+            document.getElementById('view-level-2').classList.add('hidden');
+            document.getElementById('view-level-3').classList.add('hidden');
+            document.getElementById('view-level-4').classList.add('hidden');
+            document.getElementById('view-level-5').classList.add('hidden');
+            document.getElementById('view-map').classList.remove('hidden');
+        }
+
+        function toggleMusic() {
+            playSound('click');
+            const btn = document.getElementById('soundBtn');
+            btn.classList.toggle('bg-emerald-600');
+        }
+    </script>
+</body>
+</html>
